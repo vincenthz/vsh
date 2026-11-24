@@ -128,6 +128,11 @@ impl Shell {
             if cfg!(windows) && k.eq_ignore_ascii_case("path") {
                 k = "PATH".into();
             }
+            // cmd.exe's PROMPT (e.g. `$P$G`) is always in the Windows environment;
+            // it would shadow PS1 and the default prompt.
+            if cfg!(windows) && k.eq_ignore_ascii_case("prompt") {
+                continue;
+            }
             vars.insert(k, Var { value: Value::Str(v), exported: true, readonly: false });
         }
         let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("/"));
